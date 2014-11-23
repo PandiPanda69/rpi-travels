@@ -1,0 +1,27 @@
+doctype html
+html
+  head
+    title="RPi-Travels"
+    meta(name="viewport", content="initial-scale=1.0, user-scalable=no")
+    meta(charset="utf-8")
+    link(rel="stylesheet" href="/css/style.css")
+    link(rel="stylesheet" href="/css/bootstrap.min.css")
+    script(src="https://maps.googleapis.com/maps/api/js?v=3.exp")
+  
+  body
+    div(class="navbar navbar-inverse navbar-fixed-top" role="navigation")
+      div(class="navbar-inner")
+        div(class="container")
+
+          a(class="brand" href="/")
+            //img(src="/images/rpi-travels.png" style="width: 28px;")
+            span RPi Travels
+
+
+  
+    div(id="map-canvas")
+
+    script(src="/js/travels.js")
+    script.
+      theApp = new App('map-canvas');
+
