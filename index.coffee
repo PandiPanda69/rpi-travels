@@ -5,6 +5,8 @@ logger = require("morgan")
 cookieParser = require("cookie-parser")
 bodyParser = require("body-parser")
 routes = require("./routes/index")
+markers = require("./routes/marker")
+database = require("./utils/database")
 config = require("./config")()
 
 
@@ -28,6 +30,7 @@ app.set "view engine", "jade"
 
 # Request mapping
 app.use "/", routes
+app.use "/marker", markers
 
 # catch 404 and forward to error handler
 app.use (req, res, next) ->
@@ -63,9 +66,21 @@ app.use (err, req, res, next) ->
 
 
 # Start listening
-app.listen config.port, () -> 
+server = app.listen config.port, -> 
   console.log 'Started on ' + config.port
+  database.connect()
   return
 
+# Register events to properly close server
+cleanup = ->
+  server.close ->
+    console.log 'Closing server...'
+    database.close()
+    return
+  return
+  
+
+process.on 'SIGTERM', cleanup
+process.on 'SIGINT',  cleanup
 
 module.exports = app

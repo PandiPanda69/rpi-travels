@@ -4,6 +4,7 @@ config =
 	dev:
 		mode: "dev"
 		port: 8080
+		database_path: './database/travels.db'
 	prod:
 		mode: "prod"
 		port: 81
