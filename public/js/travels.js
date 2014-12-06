@@ -1,5 +1,6 @@
 var App = (function() {
 	var map = null;
+	var infoWindow = null;
 
 	var allMarkers = null;
 	var currentMarker = null;
@@ -48,6 +49,19 @@ var App = (function() {
 
 	var displayAllMarkers = function() {
 		console.log(allMarkers);
+
+		$.each(allMarkers, function(i, e) {
+			var position = new google.maps.LatLng(e.latitude, e.longitude);
+
+			var current = new google.maps.Marker({
+				position: position,
+				map: map
+			});
+
+			google.maps.event.addDomListener(current, 'click', function() {
+				onMarkerClick(e, current);
+			});
+		});
 	};
 
 	var displayInfoWindow = function(marker, metadata) {
@@ -63,14 +77,27 @@ var App = (function() {
 		}
 		content += '<button id="save-marker" class="pull-right btn btn-success btn-small">Sauvegarder</button>';
 
-		var iw = new google.maps.InfoWindow({
+		if(metadata) {
+			currentMetadata = metadata;
+		}
+		else {
+			currentMetadata = null;
+		}
+
+		if(infoWindow) {
+			infoWindow.close();
+		}
+
+		infoWindow = new google.maps.InfoWindow({
 			content: content
 		});
 
-		iw.open(map, marker);
-		google.maps.event.addDomListener(iw, 'domready', function() {
+		infoWindow.open(map, marker);
+		google.maps.event.addDomListener(infoWindow, 'domready', function() {
 			document.getElementById('save-marker').onclick = onSaveMarker;
-			document.getElementById('remove-marker').onclick = onRemoveMarker;
+			if(metadata) {
+				document.getElementById('remove-marker').onclick = onRemoveMarker;
+			}
 		});
 	};
 
@@ -87,10 +114,8 @@ var App = (function() {
 	var onAddMarker = function() {
 		var metadata = {
 			description: document.getElementById('marker-description').value,
-			coords: {
-				lat: currentMarker.getPosition().lat(),
-				lng: currentMarker.getPosition().lng()
-			}
+			latitude: currentMarker.getPosition().lat(),
+			longitude: currentMarker.getPosition().lng()
 		};
 
 		$.ajax({
@@ -100,7 +125,7 @@ var App = (function() {
 			contentType: 'application/json',
 			data: JSON.stringify(metadata),
 
-			success: function() { alert('OK'); },
+			success: function() { infoWindow.close(); },
 			error: function() { alert('KO'); }
 		});
 	};
@@ -123,12 +148,17 @@ var App = (function() {
 
 	var onRemoveMarker = function() {
 		$.ajax({
-			url: '/marker/' + metadata.id,
+			url: '/marker/' + currentMetadata.id,
 			type: 'delete',
 
-			success: function() { alert('OK'); },
+			success: function() { currentMarker.setMap(null); },
 			error: function() { alert('KO'); } 
 		});
+	};
+
+	var onMarkerClick = function(metadata, marker) {
+		currentMarker = marker;
+		displayInfoWindow(marker, metadata);
 	};
 
 	/**
@@ -142,6 +172,7 @@ var App = (function() {
 		var position = new google.maps.LatLng(location.lat, location.lng);
 		map.panTo(position);
 
+		// Bug ! Remove also existing marker if searching
 		if(currentMarker !== null) {
 			currentMarker.setMap(null);
 		}

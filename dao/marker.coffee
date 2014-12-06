@@ -14,16 +14,26 @@ class MarkerDao
     database.db.run """
 		INSERT INTO Marker(latitude, longitude)
 		VALUES(?,?)
-	""", [data.coords.lat, data.coords.lng], (err) ->
+	""", [data.latitude, data.longitude], (err) ->
       callback err, @lastID
       return
 
     return
 
-  update: (id, data) ->
+  update: (id, data, callback) ->
+
+    database.db.run "UPDATE Marker SET latitude = ? WHERE id = ?", [data.latitude, id], (err) ->
+      callback err, @changes
+      return
+
     return
 
-  delete: (id) ->
+  delete: (id, callback) ->
+
+    database.db.run "DELETE FROM Marker WHERE id = ?", id, (err) ->
+      callback? err, @changes
+      return
+
     return
 
 module.exports = new MarkerDao()
