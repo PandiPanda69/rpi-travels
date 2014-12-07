@@ -69,9 +69,15 @@ server = app.listen config.port, ->
 
 # Register events to properly close server
 cleanup = ->
+  # Force shutdown
+  if server._connections > 0
+    console.log 'Remaining connections: ' + server._connections
+    server._connections = 0
+
   server.close ->
-    console.log 'Closing server...'
     database.close()
+    console.log 'Closing server...'
+    process.exit(0)
     return
   return
   
