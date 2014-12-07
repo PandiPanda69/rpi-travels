@@ -13,10 +13,7 @@ config = require("./config")()
 app = express()
 
 # Boilerplate conf
-if config.mode is "dev"
-	app.use logger('dev')
-else
-	app.use logger()
+app.use logger(config.logger)
 
 app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: false)
@@ -63,7 +60,6 @@ app.use (err, req, res, next) ->
     error: {}
 
   return
-
 
 # Start listening
 server = app.listen config.port, -> 
