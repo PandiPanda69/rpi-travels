@@ -13,7 +13,7 @@ config = require("./config")()
 app = express()
 
 # Boilerplate conf
-app.use logger(config.logger)
+app.use logger(config.logger, config.logger_options)
 
 app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: false)

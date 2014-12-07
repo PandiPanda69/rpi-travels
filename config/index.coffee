@@ -10,6 +10,8 @@ config =
 		mode: "prod"
 		port: 81
 		logger: "common"
+		logger_option:
+			skip: (req, res) -> (res.status < 400)
 		database_path: './database/travels.db'
 
 module.exports = (mode) ->
