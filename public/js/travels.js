@@ -69,7 +69,7 @@ var App = (function() {
 		var content = 'Description:<br/><textarea id="marker-description">';
 
 		if(metadata) {
-			content += metadata.description;
+			content += metadata.description === null ? "" : metadata.description;
 		}
 		content += '</textarea><br/>';
 		if(metadata) {
@@ -125,7 +125,7 @@ var App = (function() {
 			contentType: 'application/json',
 			data: JSON.stringify(metadata),
 
-			success: function() { infoWindow.close(); },
+			success: onAddMarkerSuccess,
 			error: function() { alert('KO'); }
 		});
 	};
@@ -141,7 +141,7 @@ var App = (function() {
 			contentType: 'application/json',
 			data: JSON.stringify(metadata),
 
-			success: function() { alert('OK'); },
+			success: function() { infoWindow.close(); currentMarker = null; },
 			error: function() { alert('KO'); } 
 		});
 	};
@@ -157,8 +157,27 @@ var App = (function() {
 	};
 
 	var onMarkerClick = function(metadata, marker) {
+		clearSearchMarker();
+
 		currentMarker = marker;
 		displayInfoWindow(marker, metadata);
+	};
+
+	var onAddMarkerSuccess = function(data) {
+		var target = currentMarker;
+	        google.maps.event.addDomListener(currentMarker, 'click', function() {
+	                onMarkerClick(data, target);
+                });
+
+
+		infoWindow.close();
+		currentMarker = null;
+	};
+
+	var clearSearchMarker = function() {
+                if(currentMarker !== null && currentMetadata === null) {
+			currentMarker.setMap(null);
+                }
 	};
 
 	/**
@@ -172,10 +191,7 @@ var App = (function() {
 		var position = new google.maps.LatLng(location.lat, location.lng);
 		map.panTo(position);
 
-		// Bug ! Remove also existing marker if searching
-		if(currentMarker !== null) {
-			currentMarker.setMap(null);
-		}
+		clearSearchMarker();
 
 		currentMarker = new google.maps.Marker({
 			position: position,

@@ -12,9 +12,9 @@ class MarkerDao
   add: (data, callback) ->
 
     database.db.run """
-		INSERT INTO Marker(latitude, longitude)
-		VALUES(?,?)
-	""", [data.latitude, data.longitude], (err) ->
+		INSERT INTO Marker(latitude, longitude, description)
+		VALUES(?,?,?)
+	""", [data.latitude, data.longitude, data.description], (err) ->
       callback err, @lastID
       return
 
@@ -22,7 +22,7 @@ class MarkerDao
 
   update: (id, data, callback) ->
 
-    database.db.run "UPDATE Marker SET latitude = ? WHERE id = ?", [data.latitude, id], (err) ->
+    database.db.run "UPDATE Marker SET description = ? WHERE id = ?", [data.description, id], (err) ->
       callback err, @changes
       return
 
