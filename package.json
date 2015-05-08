@@ -20,5 +20,10 @@
     "coffee-script": ">= 1.6.x",
     "sqlite3": ">= 2.2.7",
     "wait.for": ">=0.6.x"
+  },
+  "devDependencies": {
+    "gulp": "~3.8.x",
+    "gulp-coffee": "~2.2.x",
+    "del": "~1.1.x"
   }
 }
